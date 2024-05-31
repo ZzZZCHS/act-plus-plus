@@ -8,6 +8,7 @@ data_local
 _wandb
 dataset
 checkpoints
+dataset_tmp
 
 **/.DS_Store
 

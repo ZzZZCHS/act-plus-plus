@@ -151,6 +151,7 @@ def main(args):
         pickle.dump(config, f)
     if is_eval:
         ckpt_names = [f'policy_last.ckpt']
+        # ckpt_names = ['policy_step_10000_seed_0.ckpt']
         results = []
         for ckpt_name in ckpt_names:
             success_rate, avg_return = eval_bc(config, ckpt_name, save_episode=True, num_rollouts=10)
@@ -401,6 +402,7 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
                             all_actions = torch.cat([all_actions[:, :-BASE_DELAY, :-2], all_actions[:, BASE_DELAY:, -2:]], dim=2)
                     if temporal_agg:
                         all_time_actions[[t], t:t+num_queries] = all_actions
+                        breakpoint()
                         actions_for_curr_step = all_time_actions[:, t]
                         actions_populated = torch.all(actions_for_curr_step != 0, axis=1)
                         actions_for_curr_step = actions_for_curr_step[actions_populated]
@@ -502,8 +504,8 @@ def eval_bc(config, ckpt_name, save_episode=True, num_rollouts=50):
         highest_rewards.append(episode_highest_reward)
         print(f'Rollout {rollout_id}\n{episode_return=}, {episode_highest_reward=}, {env_max_reward=}, Success: {episode_highest_reward==env_max_reward}')
 
-        # if save_episode:
-        #     save_videos(image_list, DT, video_path=os.path.join(ckpt_dir, f'video{rollout_id}.mp4'))
+        if save_episode:
+            save_videos(image_list, DT, video_path=os.path.join(ckpt_dir, f'video{rollout_id}.mp4'))
 
     success_rate = np.mean(np.array(highest_rewards) == env_max_reward)
     avg_return = np.mean(episode_returns)
